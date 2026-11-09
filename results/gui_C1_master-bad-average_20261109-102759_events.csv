@@ -1,0 +1,9 @@
+t_ms,node,kind,detail
+1053.837,2,excluded,accused=0 kind=1
+1054.695,1,excluded,accused=0 kind=1
+1054.695,3,excluded,accused=0 kind=1
+1056.741,0,excluded,accused=0 kind=1
+1057.804,1,new_view,view=1 primary=1
+1060.182,3,new_view,view=1 primary=1
+1060.700,0,new_view,view=1 primary=1
+1060.700,2,new_view,view=1 primary=1

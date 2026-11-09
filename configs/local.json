@@ -1,0 +1,24 @@
+{
+  "suite": "hybrid",
+  "zkp": true,
+  "keys_dir": "keys",
+  "nodes": [
+    { "id": 0, "addr": "127.0.0.1:7000" },
+    { "id": 1, "addr": "127.0.0.1:7001" },
+    { "id": 2, "addr": "127.0.0.1:7002" },
+    { "id": 3, "addr": "127.0.0.1:7003" }
+  ],
+  "bound_us": 200000,
+  "band_us": 50000,
+  "round_interval": "1s",
+  "collect_timeout": "400ms",
+  "slew_period": "250ms",
+  "time_samples": 4,
+  "suspect_threshold_us": 20000,
+  "suspect_after": 3,
+  "rekey_messages": 1000,
+  "rekey_seconds": 600,
+  "rekey_on_leader_change": true,
+  "progress_timeout": "4s",
+  "view_change_timeout": "3s"
+}

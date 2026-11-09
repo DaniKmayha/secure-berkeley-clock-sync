@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secure Berkeley Sync</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">⏱</div>
+    <div>
+      <h1>Secure Berkeley Clock Sync</h1>
+      <div class="sub">Hybrid PQC sessions · Groth16 ZKP · PBFT · Byzantine leader exclusion</div>
+    </div>
+  </div>
+  <div class="realclock">
+    <span class="lbl">Real time</span>
+    <span id="realTime" class="mono">--:--:--.---</span>
+  </div>
+  <div id="statusPill" class="pill idle"><span class="dot"></span><span class="txt">Idle</span></div>
+</header>
+
+<div class="layout">
+  <!-- ============================ controls ============================ -->
+  <aside id="controls">
+    <section class="step">
+      <div class="step-h"><span class="num">1</span><div><h2>Security setup</h2>
+        <div class="hint">How nodes talk to each other and whether readings are hidden with zero-knowledge proofs.</div></div></div>
+      <div id="configs" class="cards"></div>
+    </section>
+
+    <section class="step">
+      <div class="step-h"><span class="num">2</span><div><h2>Attack scenario</h2>
+        <div class="hint">Pick a ready-made attack, or build your own in step 3.</div></div></div>
+      <div id="scenarios"></div>
+    </section>
+
+    <section class="step">
+      <div class="step-h"><span class="num">3</span><div><h2>Cluster &amp; nodes</h2>
+        <div class="hint">Click any node to choose how it behaves. Node 0 starts as master.</div></div></div>
+      <div class="seg" id="nSeg" role="radiogroup" aria-label="Number of nodes">
+        <button data-n="4" class="on" role="radio">4 nodes <small>f = 1</small></button>
+        <button data-n="7" role="radio">7 nodes <small>f = 2</small></button>
+        <i class="seg-thumb"></i>
+      </div>
+      <div class="picker-wrap">
+        <svg id="picker" class="ring" viewBox="0 0 300 250" aria-label="Cluster node picker"></svg>
+        <div id="popover" class="popover hidden" role="menu"></div>
+      </div>
+      <div id="budget" class="budget"></div>
+      <div id="nodeChips" class="node-chips"></div>
+    </section>
+
+    <section class="step">
+      <button class="collapser" id="advToggle" aria-expanded="false">
+        <span>⚙ Advanced settings</span><span class="chev">▸</span>
+      </button>
+      <div class="collapse" id="advBody">
+        <div class="collapse-inner">
+          <div class="grid2">
+            <label data-tip="How long the experiment runs.">Duration (s)<input id="duration" type="number" value="20" min="3" max="600"></label>
+            <label data-tip="Time between synchronisation rounds.">Round interval (ms)<input id="interval" type="number" value="1000" min="200" step="100"></label>
+            <label data-tip="One-way network delay of every link.">Link latency (ms)<input id="latency" type="number" value="2" min="0" step="0.5"></label>
+            <label data-tip="Random extra delay on each message (makes timing noisy).">Jitter (ms)<input id="jitter" type="number" value="1" min="0" step="0.5"></label>
+            <label data-tip="Clocks start randomly within ± this many ms of real time.">Initial offset ± (ms)<input id="initOffset" type="number" value="150" min="0" max="190"></label>
+            <label data-tip="How fast each clock runs wrong (parts per million).">Drift ± (ppm)<input id="drift" type="number" value="200" min="0"></label>
+            <label data-tip="Same seed = same starting clocks, so runs are reproducible.">Random seed<input id="seed" type="number" value="1" min="1"></label>
+            <label class="reset"><span>&nbsp;</span><button type="button" id="resetAdv" class="ghost">Reset defaults</button></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="startBtn" class="primary"><span class="spin"></span><span class="lbl">▶ Start experiment</span></button>
+      <button id="stopBtn" disabled>■ Stop</button>
+    </section>
+    <p id="statusText" class="desc"></p>
+    <p id="savedText" class="saved"></p>
+  </aside>
+
+  <!-- ============================ main ============================ -->
+  <main>
+    <!-- Scenario explanation: always visible, collapses to a summary while running -->
+    <section id="briefing" class="panel brief">
+      <div class="brief-h">
+        <div>
+          <div class="eyebrow">Scenario explained</div>
+          <h3 id="briefTitle">–</h3>
+        </div>
+        <div class="brief-right">
+          <span id="verdict" class="verdict"></span>
+          <button id="briefToggle" class="ghost small" aria-expanded="true">Hide details</button>
+        </div>
+      </div>
+      <div id="impact" class="impact hidden"></div>
+      <div class="collapse open" id="briefBody">
+        <div class="collapse-inner">
+          <div id="explain" class="explain"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="dash" class="hidden">
+      <div id="runTitle" class="runtitle"></div>
+
+      <div class="toprow">
+        <div class="panel">
+          <div class="panel-h">
+            <h3>Live cluster <span class="muted">(dots = readings in, corrections out)</span></h3>
+            <span id="phase" class="phase"></span>
+          </div>
+          <svg id="topo" class="ring" viewBox="0 0 300 250"></svg>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h3>Expected milestones <span class="muted">(ticked live as they happen)</span></h3>
+            <span id="msCount" class="muted mono"></span></div>
+          <ol id="milestones" class="milestones"></ol>
+        </div>
+      </div>
+
+      <div id="nodes" class="nodes"></div>
+
+      <div class="panel">
+        <div class="panel-h">
+          <h3>Clock alignment <span class="muted">(where each clock is compared with real time)</span></h3>
+          <span id="alignRange" class="muted mono"></span>
+        </div>
+        <canvas id="align" height="70"></canvas>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="charts">
+        <div class="panel">
+          <div class="panel-h">
+            <h3>Clock offset from real time <span class="muted">(ms)</span></h3>
+            <label class="toggle"><input type="checkbox" id="zoomOffsets"> last 5 s</label>
+          </div>
+          <canvas id="offsets" height="260"></canvas>
+          <div id="legend" class="legend"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">
+            <h3>Synchronisation spread <span class="muted">(max − min of honest clocks, ms, log scale)</span></h3>
+          </div>
+          <canvas id="spread" height="260"></canvas>
+          <div class="legend"><span><i style="background:#2ec4a6"></i>spread</span>
+            <span><i class="dash" style="border-color:#f2b33d"></i>view change</span>
+            <span><i class="dash" style="border-color:#e8657a"></i>exclusion</span></div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="panel">
+          <div class="panel-h"><h3>Committed rounds</h3></div>
+          <div class="tablewrap">
+            <table id="rounds">
+              <thead><tr><th>Round</th><th>View</th><th>Master</th><th>Average</th><th>Readings</th><th>Latency</th><th>Adjustments (speed up + / slow down −)</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">
+            <h3>Events</h3>
+            <label class="toggle"><input type="checkbox" id="showLog"> protocol log</label>
+          </div>
+          <div id="events" class="feed"></div>
+          <pre id="log" class="log hidden"></pre>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="explain.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+t_ms,node,kind,detail
+3565.937,2,witness_suspect,view=0 peer=3 offset_us=79954
+3566.506,1,witness_suspect,view=0 peer=2 offset_us=-79789
+3571.345,1,new_view,view=1 primary=1
+3574.613,0,new_view,view=1 primary=1
+3574.613,2,new_view,view=1 primary=1
+3574.613,3,new_view,view=1 primary=1

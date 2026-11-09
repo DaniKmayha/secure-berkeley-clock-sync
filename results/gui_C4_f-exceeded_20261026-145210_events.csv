@@ -1,0 +1,21 @@
+t_ms,node,kind,detail
+1269.393,2,excluded,accused=0 kind=1
+1270.070,3,excluded,accused=0 kind=1
+1270.070,1,excluded,accused=0 kind=1
+1273.241,1,new_view,view=1 primary=1
+1276.215,2,new_view,view=1 primary=1
+1276.793,3,new_view,view=1 primary=1
+1279.564,0,excluded,accused=0 kind=1
+1280.651,0,new_view,view=1 primary=1
+3765.922,2,witness_suspect,view=1 peer=3 offset_us=611562
+3766.587,3,witness_suspect,view=1 peer=2 offset_us=-611961
+3771.774,2,new_view,view=2 primary=2
+3774.687,3,new_view,view=2 primary=2
+3774.687,0,new_view,view=2 primary=2
+3774.687,1,new_view,view=2 primary=2
+6325.490,1,witness_suspect,view=2 peer=3 offset_us=1211948
+6327.167,3,witness_suspect,view=2 peer=1 offset_us=-1212256
+6332.414,3,new_view,view=3 primary=3
+6334.572,1,new_view,view=3 primary=3
+6335.108,2,new_view,view=3 primary=3
+6336.189,0,new_view,view=3 primary=3

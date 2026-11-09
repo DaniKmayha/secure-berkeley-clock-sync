@@ -1,0 +1,46 @@
+# Reproducible 4-node deployment (n = 4, f = 1).
+#
+#   docker compose -f docker/docker-compose.yml run --rm keygen   # once
+#   docker compose -f docker/docker-compose.yml up node0 node1 node2 node3
+#
+# Each node gets a different synthetic initial clock offset / drift.
+# To test a Byzantine master, change node0's command to add e.g.
+#   "-byzantine", "bad-average"
+# All containers share the host's real clock, so the STATUS lines
+# ("offset from host clock") are directly comparable across nodes.
+
+x-node: &node
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  volumes:
+    - keys:/keys
+    - ../results:/results
+  # Identical CPU limits for every node (comparable measurements).
+  cpus: 1.0
+  mem_limit: 512m
+
+services:
+  keygen:
+    <<: *node
+    entrypoint: ["/usr/local/bin/keygen", "-n", "4", "-out", "/keys"]
+
+  node0:
+    <<: *node
+    hostname: node0
+    command: ["-config", "/configs/docker.json", "-id", "0", "-offset", "-120000", "-drift", "150", "-out", "/results"]
+  node1:
+    <<: *node
+    hostname: node1
+    command: ["-config", "/configs/docker.json", "-id", "1", "-offset", "40000", "-drift", "-80", "-out", "/results"]
+  node2:
+    <<: *node
+    hostname: node2
+    command: ["-config", "/configs/docker.json", "-id", "2", "-offset", "95000", "-drift", "60", "-out", "/results"]
+  node3:
+    <<: *node
+    hostname: node3
+    command: ["-config", "/configs/docker.json", "-id", "3", "-offset", "-30000", "-drift", "-190", "-out", "/results"]
+
+volumes:
+  keys:

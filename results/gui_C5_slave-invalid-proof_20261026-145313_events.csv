@@ -1,0 +1,6 @@
+t_ms,node,kind,detail
+1075.276,0,reading_rejected,node=3 berkeley: invalid: node 3: range proof: zkp: invalid proof
+1075.276,0,excluded,accused=3 kind=3
+1080.477,2,excluded,accused=3 kind=3
+1080.477,1,excluded,accused=3 kind=3
+1080.477,3,excluded,accused=3 kind=3

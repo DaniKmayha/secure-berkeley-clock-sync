@@ -1,0 +1,17 @@
+# Unrelated (non-thesis) material kept in this folder
+EMERGE Events/
+EMERGE Reel - Mona Lisa Heist/
+EMERGE_SAF_Tasks/
+
+# Generated identity keys and Groth16 setups (cmd/keygen output)
+keys/
+
+# Build / editor / OS leftovers
+*.test
+*.out
+.vscode/
+.idea/
+.claude/
+Thumbs.db
+desktop.ini
+.DS_Store
